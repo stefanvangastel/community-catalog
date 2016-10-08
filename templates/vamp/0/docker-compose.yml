@@ -1,0 +1,88 @@
+
+consul:
+  labels:
+    io.rancher.container.pull_image: always
+  tty: true
+  command:
+  - -server
+  - -bootstrap
+  hostname: consul
+  image: gliderlabs/consul-server
+  stdin_open: true
+
+elastic:
+  labels:
+    io.rancher.container.pull_image: always
+  tty: true
+  hostname: elastic
+  image: magneticio/elastic:2.2
+  stdin_open: true
+
+loadbalancer:
+  ports:
+  - ${VAMP_UI_PORT}:8080
+  tty: true
+  image: rancher/load-balancer-service
+  links:
+  - vamp:vamp
+  stdin_open: true
+
+vamp:
+  environment:
+    VAMP_CONTAINER_DRIVER_RANCHER_URL: ${VAMP_CONTAINER_DRIVER_RANCHER_URL}
+  labels:
+    io.rancher.container.pull_image: always
+  tty: true
+  hostname: vamp
+  image: magneticio/vamp:0.9.0-rancher
+  stdin_open: true
+
+vamp-workflow-kibana:
+  environment:
+    VAMP_KEY_VALUE_STORE_TYPE: consul
+    VAMP_KEY_VALUE_STORE_CONNECTION: consul:8500
+    VAMP_URL: http://vamp:8080
+    VAMP_KEY_VALUE_STORE_ROOT_PATH: /vamp/workflow/kibana
+  labels:
+    breed: kibana
+    workflow: kibana
+  image: magneticio/vamp-workflow-agent:0.9.0
+
+vamp-workflow-metrics:
+  environment:
+    VAMP_KEY_VALUE_STORE_TYPE: consul
+    VAMP_KEY_VALUE_STORE_CONNECTION: consul:8500
+    VAMP_URL: http://vamp:8080
+    VAMP_KEY_VALUE_STORE_ROOT_PATH: /vamp/workflow/metrics
+  labels:
+    breed: metrics
+    workflow: metrics
+  image: magneticio/vamp-workflow-agent:0.9.0
+
+ vamp-workflow-health:
+  environment:
+    VAMP_KEY_VALUE_STORE_TYPE: consul
+    VAMP_KEY_VALUE_STORE_CONNECTION: consul:8500
+    VAMP_URL: http://vamp:8080
+    VAMP_KEY_VALUE_STORE_ROOT_PATH: /vamp/workflow/health
+  labels:
+    breed: health
+    workflow: health
+  image: magneticio/vamp-workflow-agent:0.9.0
+
+vamp-gateway-agent:
+  labels:
+    io.rancher.scheduler.global: 'true'
+    io.rancher.container.pull_image: always
+  tty: true
+  command:
+  - --storeType=consul
+  - --storeConnection=consul:8500
+  - --storeKey=/vamp/haproxy/1.6
+  - --logstash=elastic:10001
+  hostname: vamp-gateway-agent
+  image: magneticio/vamp-gateway-agent:0.9.0
+  links:
+  - consul:consul
+  - elastic:elastic
+  stdin_open: true
