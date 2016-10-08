@@ -1,6 +1,6 @@
 name: Vamp
 description: |
   Vamp, or the Very Awesome Microservices Platform, takes the pain out of running complex and critical service based architectures. Vamp's core features are a platform-agnostic microservices DSL, powerful A-B testing/canary releasing, autoscaling and an integrated metrics & event engine.
-version: v0.9-rancher
+version: v0.9.0-rancher
 category: Microservices
 maintainer: "Stefan van Gastel <stefanvangastel@gmail.com>"
