@@ -55,3 +55,36 @@ vamp-gateway-agent:
   - consul:consul
   - elastic:elastic
   stdin_open: true
+
+vamp-workflow-health:
+  environment:
+    VAMP_KEY_VALUE_STORE_TYPE: consul
+    VAMP_KEY_VALUE_STORE_CONNECTION: consul:8500
+    VAMP_URL: http://vamp:8080
+    VAMP_KEY_VALUE_STORE_ROOT_PATH: /vamp/workflow/health
+  labels:
+    breed: health
+    workflow: health
+  image: magneticio/vamp-workflow-agent:0.9.0
+
+vamp-workflow-metrics:
+  environment:
+    VAMP_KEY_VALUE_STORE_TYPE: consul
+    VAMP_KEY_VALUE_STORE_CONNECTION: consul:8500
+    VAMP_URL: http://vamp:8080
+    VAMP_KEY_VALUE_STORE_ROOT_PATH: /vamp/workflow/metrics
+  labels:
+    breed: metrics
+    workflow: metrics
+  image: magneticio/vamp-workflow-agent:0.9.0
+
+vamp-workflow-kibana:
+  environment:
+    VAMP_KEY_VALUE_STORE_TYPE: consul
+    VAMP_KEY_VALUE_STORE_CONNECTION: consul:8500
+    VAMP_URL: http://vamp:8080
+    VAMP_KEY_VALUE_STORE_ROOT_PATH: /vamp/workflow/kibana
+  labels:
+    breed: kibana
+    workflow: kibana
+  image: magneticio/vamp-workflow-agent:0.9.0
