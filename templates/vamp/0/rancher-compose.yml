@@ -27,6 +27,12 @@
       label: "Rancher API access key secret"
       required: false
       type: "password"
+    - variable: CONSUL_DATA_MOUNT
+      description: "The host (or Convoy) mount point."
+      label: "Consul data mount point"
+      required: true
+      default: "/backup/vamp/consul/data"
+      type: "string"
 
 vamp-workflow-health:
   scale: 1
