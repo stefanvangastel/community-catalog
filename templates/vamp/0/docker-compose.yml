@@ -7,6 +7,8 @@ consul:
   - -server
   - -bootstrap
   hostname: consul
+  volumes:
+  - ${CONSUL_DATA_MOUNT}:/data
   image: gliderlabs/consul-server
   stdin_open: true
 
