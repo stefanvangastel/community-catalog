@@ -23,7 +23,7 @@ vamp:
   image: magneticio/vamp:0.9.1-rancher
   stdin_open: true
   links:
-  - ${VAMP_KEY_SERVICE}:${VAMP_KEY_VALUE_STORE_TYPE}
+  - ${VAMP_KEY_VALUE_STORE_SERVICE}:${VAMP_KEY_VALUE_STORE_TYPE}
   - ${VAMP_DATABASE_SERVICE}:${VAMP_DATABASE_TYPE}
 
 vamp-gateway-agent:
@@ -40,6 +40,6 @@ vamp-gateway-agent:
   - --logstash=${VAMP_DATABASE_TYPE}:${VAMP_DATABASE_PORT}
   image: magneticio/vamp-gateway-agent:0.9.1
   links:
-  - ${VAMP_KEY_SERVICE}:${VAMP_KEY_VALUE_STORE_TYPE}
+  - ${VAMP_KEY_VALUE_STORE_SERVICE}:${VAMP_KEY_VALUE_STORE_TYPE}
   - ${VAMP_DATABASE_SERVICE}:${VAMP_DATABASE_TYPE}
   stdin_open: true
