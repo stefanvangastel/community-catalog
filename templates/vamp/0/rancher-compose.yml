@@ -1,45 +1,97 @@
 .catalog:
   name: "Vamp"
-  version: "v0.9.0-rancher"
+  version: "v0.9.1-rancher"
   description: "Vamp, or the Very Awesome Microservices Platform, takes the pain out of running complex and critical service based architectures. Vamp's core features are a platform-agnostic microservices DSL, powerful A-B testing/canary releasing, autoscaling and an integrated metrics & event engine."
   uuid: vamp-0
   minimum_rancher_version: v0.51.0
   questions:    
+  
     - variable: VAMP_UI_PORT
       description: "public port to access the vamp ui"
       label: "Vamp UI port"
       required: true
       default: "9090"
       type: "int"
+      
     - variable: VAMP_CONTAINER_DRIVER_RANCHER_URL
       description: "Find the API endpoint, e.g. http://192.168.99.100:8080/v1/projects/1a5, using the API button in the top."
       label: "Rancher Server API endpoint"
       required: true
       default: "http://172.17.0.2:8080/v1/projects/1a5"
       type: "string"
+      
     - variable: VAMP_CONTAINER_DRIVER_RANCHER_USER
       description: "Optional Rancher API access key"
       label: "Rancher API access key"
       required: false
       type: "string"
+      
     - variable: VAMP_CONTAINER_DRIVER_RANCHER_PASSWORD
       description: "Optional Rancher API access key secret"
       label: "Rancher API access key secret"
       required: false
       type: "password"
-    - variable: CONSUL_DATA_MOUNT
-      description: "The host (or Convoy) mount point."
-      label: "Consul data mount point"
+      
+    - variable: VAMP_DATABASE_TYPE
+      label: "Vamp database type:"
+      description: |
+        Vamp db type to use.
+      default: elasticsearch
       required: true
-      default: "/backup/vamp/consul/data"
+      type: "enum"
+      options:
+        - elasticsearch
+        
+    - variable: VAMP_DATABASE_PORT
+      description: "Vamp database port:"
+      label: "Vamp db port:"
+      required: true
+      default: 9200
+      type: "int"
+           
+    - variable: VAMP_DATABASE_SERVICE
+      description: |
+        Choose the Elasticsearch service to use.
+      label: "Elasticsearch stack/service"
+      default: "elasticsearch/elasticsearch-masters"
+      required: true
+      type: "service"
+      
+      
+    - variable: VAMP_KEY_VALUE_STORE_TYPE
+      label: "Vamp key type:"
+      description: |
+        Vamp key type to use.
+      default: zookeeper
+      required: true
+      type: "enum"
+      options:
+        - zookeeper
+        - etcd
+        - consul
+        
+    - variable: VAMP_KEY_VALUE_STORE_PORT
+      description: "Vamp port to connect to key"
+      label: "Vamp key port:"
+      required: true
+      default: 2181
+      type: "int"
+      
+    - variable: VAMP_KEY_VALUE_STORE_KEY
+      description: "Vamp key path to store data"
+      label: "Vamp key path:"
+      required: true
+      default: "/vamp"
       type: "string"
+      
+    - variable: VAMP_KEY_VALUE_STORE_SERVICE
+      description: |
+        Choose the key service to use.
+      label: "Vamp key stack/service"
+      default: "zookeeper/zk"
+      required: true
+      type: "service"
 
-vamp-workflow-health:
-  scale: 1
-consul:
-  scale: 1
-vamp-workflow-metrics:
-  scale: 1
 loadbalancer:
   scale: 1
   load_balancer_config:
@@ -50,9 +102,5 @@ loadbalancer:
     unhealthy_threshold: 3
     healthy_threshold: 2
     response_timeout: 2000
-elastic:
-  scale: 1
-vamp-workflow-kibana:
-  scale: 1
 vamp:
   scale: 1
