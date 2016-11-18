@@ -1,25 +1,4 @@
 
-consul:
-  labels:
-    io.rancher.container.pull_image: always
-  tty: true
-  command:
-  - -server
-  - -bootstrap
-  hostname: consul
-  volumes:
-  - ${CONSUL_DATA_MOUNT}:/data
-  image: gliderlabs/consul-server
-  stdin_open: true
-
-elastic:
-  labels:
-    io.rancher.container.pull_image: always
-  tty: true
-  hostname: elastic
-  image: magneticio/elastic:2.2
-  stdin_open: true
-
 loadbalancer:
   ports:
   - ${VAMP_UI_PORT}:8080
@@ -34,26 +13,33 @@ vamp:
     VAMP_CONTAINER_DRIVER_RANCHER_URL: ${VAMP_CONTAINER_DRIVER_RANCHER_URL}
     VAMP_CONTAINER_DRIVER_RANCHER_USER: ${VAMP_CONTAINER_DRIVER_RANCHER_USER}
     VAMP_CONTAINER_DRIVER_RANCHER_PASSWORD: ${VAMP_CONTAINER_DRIVER_RANCHER_PASSWORD}
+    VAMP_DATABASE_TYPE: ${VAMP_DATABASE_TYPE}
+    VAMP_KEY_VALUE_STORE_TYPE: ${VAMP_KEY_VALUE_STORE_TYPE}
   labels:
+    io.rancher.scheduler.affinity:container_label_soft_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name}
+    io.rancher.container.hostname_override: container_name
     io.rancher.container.pull_image: always
   tty: true
-  hostname: vamp
-  image: magneticio/vamp:0.9.0-rancher
+  image: magneticio/vamp:0.9.1-rancher
   stdin_open: true
+  external-links:
+  - ${VAMP_KEY_SERVICE}:${VAMP_KEY_VALUE_STORE_TYPE}
+  - ${VAMP_DATABASE_SERVICE}:${VAMP_DATABASE_TYPE}
 
 vamp-gateway-agent:
   labels:
+    io.rancher.scheduler.affinity:container_label_soft_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name}
+    io.rancher.container.hostname_override: container_name
     io.rancher.scheduler.global: 'true'
     io.rancher.container.pull_image: always
   tty: true
   command:
-  - --storeType=consul
-  - --storeConnection=consul:8500
-  - --storeKey=/vamp/haproxy/1.6
-  - --logstash=elastic:10001
-  hostname: vamp-gateway-agent
-  image: magneticio/vamp-gateway-agent:0.9.0
-  links:
-  - consul:consul
-  - elastic:elastic
+  - --storeType=${VAMP_KEY_VALUE_STORE_TYPE}
+  - --storeConnection=${VAMP_KEY_VALUE_STORE_TYPE}:${VAMP_KEY_VALUE_STORE_PORT}
+  - --storeKey=${VAMP_KEY_VALUE_STORE_KEY}
+  - --logstash=${VAMP_DATABASE_TYPE}:${VAMP_DATABASE_PORT}
+  image: magneticio/vamp-gateway-agent:0.9.1
+  external-links:
+  - ${VAMP_KEY_SERVICE}:${VAMP_KEY_VALUE_STORE_TYPE}
+  - ${VAMP_DATABASE_SERVICE}:${VAMP_DATABASE_TYPE}
   stdin_open: true
